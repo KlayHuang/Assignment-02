@@ -1,0 +1,14 @@
+Serilog:
+  MinimumLevel:
+    Default: "Information"
+    Override:
+      Microsoft: "Warning"
+      System: "Warning"
+  Enrich: [FromLogContext]
+  WriteTo:
+    - Name: Console
+    - Name: File
+      Args:
+        path: "Logs/log-.txt"
+        rollingInterval: Day
+        # formatter: Serilog.Formatting.Compact.CompactJsonFormatter, Serilog.Formatting.Compact
