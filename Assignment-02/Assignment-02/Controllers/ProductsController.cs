@@ -21,8 +21,9 @@ namespace Assignment_02.Controllers
         // GET: Products
         public async Task<IActionResult> Index()
         {
-            var adventureWorksLT2022Context = _context.Product.Include(p => p.ProductCategory).Include(p => p.ProductModel);
-            return View(await adventureWorksLT2022Context.ToListAsync());
+            //var adventureWorksLT2022Context = _context.Product.Include(p => p.ProductCategory).Include(p => p.ProductModel);
+            //return View(await adventureWorksLT2022Context.ToListAsync());
+            return View(await _context.Product.ToListAsync());
         }
 
         // GET: Products/Details/5
@@ -58,7 +59,7 @@ namespace Assignment_02.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ProductID,Name,ProductNumber,Color,StandardCost,ListPrice,Size,Weight,ProductCategoryID,ProductModelID,SellStartDate,SellEndDate,DiscontinuedDate,ThumbNailPhoto,ThumbnailPhotoFileName,rowguid,ModifiedDate")] Product product)
+        public async Task<IActionResult> Create(Product product)
         {
             if (ModelState.IsValid)
             {
@@ -72,6 +73,7 @@ namespace Assignment_02.Controllers
         }
 
         // GET: Products/Edit/5
+        [HttpGet]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -84,8 +86,15 @@ namespace Assignment_02.Controllers
             {
                 return NotFound();
             }
-            ViewData["ProductCategoryID"] = new SelectList(_context.ProductCategory, "ProductCategoryID", "Name", product.ProductCategoryID);
-            ViewData["ProductModelID"] = new SelectList(_context.ProductModel, "ProductModelID", "Name", product.ProductModelID);
+            //ViewData["ProductCategoryID"] = new SelectList(_context.ProductCategory, "ProductCategoryID", "Name", product.ProductCategoryID);
+            //ViewData["ProductModelID"] = new SelectList(_context.ProductModel, "ProductModelID", "Name", product.ProductModelID);
+
+            //image
+            if (product.ThumbNailPhoto != null)
+            {
+                ViewData["ThumbnailPhotoBase64"] = Convert.ToBase64String(product.ThumbNailPhoto);
+            }
+
             return View(product);
         }
 
@@ -94,7 +103,7 @@ namespace Assignment_02.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ProductID,Name,ProductNumber,Color,StandardCost,ListPrice,Size,Weight,ProductCategoryID,ProductModelID,SellStartDate,SellEndDate,DiscontinuedDate,ThumbNailPhoto,ThumbnailPhotoFileName,rowguid,ModifiedDate")] Product product)
+        public async Task<IActionResult> Edit(int id,  Product product)
         {
             if (id != product.ProductID)
             {
@@ -121,8 +130,8 @@ namespace Assignment_02.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["ProductCategoryID"] = new SelectList(_context.ProductCategory, "ProductCategoryID", "Name", product.ProductCategoryID);
-            ViewData["ProductModelID"] = new SelectList(_context.ProductModel, "ProductModelID", "Name", product.ProductModelID);
+            //ViewData["ProductCategoryID"] = new SelectList(_context.ProductCategory, "ProductCategoryID", "Name", product.ProductCategoryID);
+            //ViewData["ProductModelID"] = new SelectList(_context.ProductModel, "ProductModelID", "Name", product.ProductModelID);
             return View(product);
         }
 
