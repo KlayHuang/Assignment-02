@@ -19,11 +19,31 @@ namespace Assignment_02.Controllers
         }
 
         // GET: Products
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int page)
         {
-            //var adventureWorksLT2022Context = _context.Product.Include(p => p.ProductCategory).Include(p => p.ProductModel);
-            //return View(await adventureWorksLT2022Context.ToListAsync());
-            return View(await _context.Product.ToListAsync());
+            if (page < 1)
+            {
+                page = 1;
+            }
+            int pageSize = 10; 
+            int totalProducts = await _context.Product.CountAsync(); 
+            int totalPages = (int)Math.Ceiling((double)totalProducts / pageSize); 
+
+            
+            if (page > totalPages)
+            {
+                page = totalPages;
+            }
+            var products = await _context.Product
+                .OrderBy(p => p.ProductID) 
+                .Skip((page - 1) * pageSize) 
+                .Take(pageSize) 
+                .ToListAsync();
+
+            ViewBag.CurrentPage = page;
+            ViewBag.TotalPages = totalPages;
+
+            return View(products);
         }
 
         // GET: Products/Details/5

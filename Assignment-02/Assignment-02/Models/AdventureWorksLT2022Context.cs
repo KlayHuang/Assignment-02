@@ -45,9 +45,11 @@ public partial class AdventureWorksLT2022Context : DbContext
             entity.Property(e => e.ThumbNailPhoto).HasComment("Small image of the product.");
             entity.Property(e => e.ThumbnailPhotoFileName).HasComment("Small image file name.");
             entity.Property(e => e.Weight).HasComment("Product weight.");
+            
             entity.Property(e => e.rowguid)
                 .HasDefaultValueSql("(newid())")
                 .HasComment("ROWGUIDCOL number uniquely identifying the record. Used to support a merge replication sample.");
+            
         });
 
         modelBuilder.Entity<ProductCategory>(entity =>

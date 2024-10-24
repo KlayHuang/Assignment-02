@@ -4,13 +4,10 @@
     ViewData["Title"] = "編輯產品資訊";
 }
 
-<h1>Edit</h1>
-
-<h4>Product</h4>
+<h1 class="text-center">編輯產品資訊</h1>
 <hr />
-<div class="row">
-    <div class="col-md-4">
-        <!--因為 <form> 標籤的默認行為是使用 POST 方法提交數據-->
+<div class="row justify-content-center">
+    <div class="col-md-8">
         <form asp-action="Edit" method="post">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="ProductID" />
@@ -83,35 +80,91 @@
                     <br />
                 }
             </div>
-            <!--
-            <div class="form-group">
+
+            <div class="form-group" hidden="true">
                 <label asp-for="ThumbnailPhotoFileName" class="control-label"></label>
                 <input asp-for="ThumbnailPhotoFileName" class="form-control" />
                 <span asp-validation-for="ThumbnailPhotoFileName" class="text-danger"></span>
             </div>
-            
-            <div class="form-group">
+
+            <div class="form-group" hidden="true">
                 <label asp-for="rowguid" class="control-label"></label>
                 <input asp-for="rowguid" class="form-control" />
                 <span asp-validation-for="rowguid" class="text-danger"></span>
             </div>
-            -->
+
             <div class="form-group">
                 <label asp-for="ModifiedDate" class="control-label"></label>
                 <input asp-for="ModifiedDate" class="form-control" />
                 <span asp-validation-for="ModifiedDate" class="text-danger"></span>
             </div>
-            <div class="form-group">
+            <div class="form-group text-center">
                 <input type="submit" value="儲存" class="btn btn-primary" />
             </div>
         </form>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
+<div class="text-center">
+    <a asp-action="Index" class="btn btn-secondary">Back to List</a>
 </div>
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 }
+
+<!-- CSS 樣式 -->
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f8f9fa;
+        margin: 0;
+        padding: 0;
+    }
+
+    .container {
+        margin-top: 50px;
+    }
+
+    h1 {
+        font-size: 2.5rem;
+        color: #343a40;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-control {
+        border-radius: 5px;
+    }
+
+    .btn-primary {
+        background-color: #007bff;
+        border-color: #007bff;
+    }
+
+    .btn-primary:hover {
+        background-color: #0056b3;
+        border-color: #0056b3;
+    }
+
+    .btn-secondary {
+        background-color: #6c757d;
+        border-color: #6c757d;
+    }
+
+    .btn-secondary:hover {
+        background-color: #565e64;
+        border-color: #565e64;
+    }
+
+    .text-danger {
+        color: #dc3545;
+    }
+
+    .img-thumbnail {
+        max-width: 100%;
+        height: auto;
+    }
+</style>
