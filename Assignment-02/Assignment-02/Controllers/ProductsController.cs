@@ -12,47 +12,57 @@ namespace Assignment_02.Controllers
     public class ProductsController : Controller
     {
         private readonly AdventureWorksLT2022Context _context;
+        private readonly ILogger<ProductsController> _logger;
 
-        public ProductsController(AdventureWorksLT2022Context context)
+        public ProductsController(AdventureWorksLT2022Context context, ILogger<ProductsController> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         // GET: Products
         public async Task<IActionResult> Index(string searchTerm, int page)
         {
-            if (page < 1)
+            try
             {
-                page = 1;
-            }
+                if (page < 1)
+                {
+                    page = 1;
+                }
 
-            int pageSize = 10;
-            // 產品搜尋
-            IQueryable<Product> productsQuery = _context.Product;
-            if (!string.IsNullOrEmpty(searchTerm))
+                int pageSize = 10;
+                // 產品搜尋
+                IQueryable<Product> productsQuery = _context.Product;
+                if (!string.IsNullOrEmpty(searchTerm))
+                {
+                    productsQuery = productsQuery.Where(p => p.Name.Contains(searchTerm));
+                    ViewBag.SearchTerm = searchTerm;
+                }
+                // -----
+                int totalProducts = await productsQuery.CountAsync();
+                int totalPages = (int)Math.Ceiling((double)totalProducts / pageSize);
+
+                if (page > totalPages && totalPages > 0)
+                {
+                    page = totalPages;
+                }
+
+                var products = await productsQuery
+                    .OrderBy(p => p.ProductID)
+                    .Skip((page - 1) * pageSize)
+                    .Take(pageSize)
+                    .ToListAsync();
+
+                ViewBag.CurrentPage = page;
+                ViewBag.TotalPages = totalPages;
+
+                return View(products);
+            }
+            catch (Exception ex)
             {
-                productsQuery = productsQuery.Where(p => p.Name.Contains(searchTerm));
-                ViewBag.SearchTerm = searchTerm; 
+                _logger.LogError(ex.Message);
             }
-            // -----
-            int totalProducts = await productsQuery.CountAsync();
-            int totalPages = (int)Math.Ceiling((double)totalProducts / pageSize);
-
-            if (page > totalPages && totalPages > 0)
-            {
-                page = totalPages;
-            }
-
-            var products = await productsQuery
-                .OrderBy(p => p.ProductID)
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
-                .ToListAsync();
-
-            ViewBag.CurrentPage = page;
-            ViewBag.TotalPages = totalPages;
-
-            return View(products);
+            return View("Error");
         }
 
         // GET: Products/Details/5
@@ -132,7 +142,7 @@ namespace Assignment_02.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id,  Product product, IFormFile ThumbNailPhoto)
+        public async Task<IActionResult> Edit(int id,  Product product, IFormFile ThumbNailPhoto = null)
         {
             if (id != product.ProductID)
             {
@@ -167,8 +177,9 @@ namespace Assignment_02.Controllers
                     _context.Update(product);
                     await _context.SaveChangesAsync();
                 }
-                catch (DbUpdateConcurrencyException)
+                catch (Exception ex)
                 {
+                    _logger.LogError(ex.Message);
                     if (!ProductExists(product.ProductID))
                     {
                         return NotFound();
@@ -194,7 +205,6 @@ namespace Assignment_02.Controllers
                     var thumbNailPhotoState = ModelState["ThumbNailPhoto"];
                     if (thumbNailPhotoState!.Errors.Any())
                     {
-                        // 處理驗證錯誤
                         var existingProduct = await _context.Product.AsNoTracking().FirstOrDefaultAsync(p => p.ProductID == id);
                         if (existingProduct != null)
                         {
