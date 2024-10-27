@@ -8,6 +8,14 @@
 
 <h2>產品維護</h2>
 
+<!-- search bar -->
+<form asp-action="Index" method="get" class="form-inline mb-3">
+    <div style="display: flex;">
+        <input type="text" name="searchTerm" class="form-control mr-2" placeholder="搜尋產品名稱" value="@ViewBag.SearchTerm" style="flex: 0 0 90%;" />
+        <button type="submit" class="btn btn-primary" style="flex: 1;">搜尋</button>
+    </div>
+</form>
+
 <table class="table">
     <thead>
         <tr>
@@ -15,6 +23,7 @@
             <th>名稱</th>
             <th>顏色</th>
             <th>產品編號</th>
+            <th>縮圖</th>
             <th>操作</th>
         </tr>
     </thead>
@@ -27,7 +36,16 @@
                 <td>@item.Color</td>
                 <td>@item.ProductNumber</td>
                 <td>
-                    <!--超連結會發送GET-->
+                    @if (item.ThumbNailPhoto != null)
+                    {
+                        <img src="data:image/jpeg;base64,@Convert.ToBase64String(item.ThumbNailPhoto)" class="img-thumbnail" style="max-width: 100px; max-height: 100px;" />
+                    }
+                    else
+                    {
+                        <span>無圖片</span>
+                    }
+                </td>
+                <td>
                     <a asp-action="Edit" asp-route-id="@item.ProductID">編輯</a>
                     <br />
                     <a asp-action="Details" asp-route-id="@item.ProductID">產品資訊</a>
@@ -37,26 +55,21 @@
     </tbody>
 </table>
 
-
 <nav aria-label="Page navigation">
     <ul class="pagination">
         <li class="page-item @(currentPage == 1 ? "disabled" : "")">
-            <a class="page-link" asp-action="Index" asp-route-page="@(currentPage - 1)">◀</a>
+            <a class="page-link" asp-action="Index" asp-route-page="@(currentPage - 1)" asp-route-searchTerm="@ViewBag.SearchTerm">◀</a>
         </li>
 
         @for (int i = 1; i <= totalPages; i++)
         {
             <li class="page-item @(i == currentPage ? "active" : "")">
-                <a class="page-link" asp-action="Index" asp-route-page="@i">@i</a>
+                <a class="page-link" asp-action="Index" asp-route-page="@i" asp-route-searchTerm="@ViewBag.SearchTerm">@i</a>
             </li>
         }
 
         <li class="page-item @(currentPage == totalPages ? "disabled" : "")">
-            <a class="page-link" asp-action="Index" asp-route-page="@(currentPage + 1)">▶</a>
+            <a class="page-link" asp-action="Index" asp-route-page="@(currentPage + 1)" asp-route-searchTerm="@ViewBag.SearchTerm">▶</a>
         </li>
     </ul>
 </nav>
-
-
-
-

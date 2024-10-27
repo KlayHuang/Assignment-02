@@ -19,25 +19,34 @@ namespace Assignment_02.Controllers
         }
 
         // GET: Products
-        public async Task<IActionResult> Index(int page)
+        public async Task<IActionResult> Index(string searchTerm, int page)
         {
             if (page < 1)
             {
                 page = 1;
             }
-            int pageSize = 10; 
-            int totalProducts = await _context.Product.CountAsync(); 
-            int totalPages = (int)Math.Ceiling((double)totalProducts / pageSize); 
 
-            
-            if (page > totalPages)
+            int pageSize = 10;
+            // 產品搜尋
+            IQueryable<Product> productsQuery = _context.Product;
+            if (!string.IsNullOrEmpty(searchTerm))
+            {
+                productsQuery = productsQuery.Where(p => p.Name.Contains(searchTerm));
+                ViewBag.SearchTerm = searchTerm; 
+            }
+            // -----
+            int totalProducts = await productsQuery.CountAsync();
+            int totalPages = (int)Math.Ceiling((double)totalProducts / pageSize);
+
+            if (page > totalPages && totalPages > 0)
             {
                 page = totalPages;
             }
-            var products = await _context.Product
-                .OrderBy(p => p.ProductID) 
-                .Skip((page - 1) * pageSize) 
-                .Take(pageSize) 
+
+            var products = await productsQuery
+                .OrderBy(p => p.ProductID)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
                 .ToListAsync();
 
             ViewBag.CurrentPage = page;
@@ -123,7 +132,7 @@ namespace Assignment_02.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id,  Product product)
+        public async Task<IActionResult> Edit(int id,  Product product, IFormFile ThumbNailPhoto)
         {
             if (id != product.ProductID)
             {
@@ -134,6 +143,27 @@ namespace Assignment_02.Controllers
             {
                 try
                 {
+                    product.ModifiedDate = DateTime.Now;
+
+                    if (ThumbNailPhoto != null && ThumbNailPhoto.Length > 0)
+                    {
+                        using (var memoryStream = new MemoryStream())
+                        {
+                            await ThumbNailPhoto.CopyToAsync(memoryStream);
+                            product.ThumbNailPhoto = memoryStream.ToArray();
+                        }
+                        product.ThumbnailPhotoFileName = ThumbNailPhoto.FileName;
+                    }
+                    else
+                    {
+                        var existingProduct = await _context.Product.AsNoTracking().FirstOrDefaultAsync(p => p.ProductID == id);
+                        if (existingProduct != null)
+                        {
+                            product.ThumbNailPhoto = existingProduct.ThumbNailPhoto;
+                            product.ThumbnailPhotoFileName = existingProduct.ThumbnailPhotoFileName;
+                        }
+                    }
+
                     _context.Update(product);
                     await _context.SaveChangesAsync();
                 }
@@ -149,6 +179,30 @@ namespace Assignment_02.Controllers
                     }
                 }
                 return RedirectToAction(nameof(Index));
+            }
+            else
+            {
+                /*
+                var errors = ModelState.Values.SelectMany(v => v.Errors);
+                foreach (var error in errors)
+                {
+                    Console.WriteLine(error.ErrorMessage);
+                }
+                */
+                if (ModelState.ContainsKey("ThumbNailPhoto"))
+                {
+                    var thumbNailPhotoState = ModelState["ThumbNailPhoto"];
+                    if (thumbNailPhotoState!.Errors.Any())
+                    {
+                        // 處理驗證錯誤
+                        var existingProduct = await _context.Product.AsNoTracking().FirstOrDefaultAsync(p => p.ProductID == id);
+                        if (existingProduct != null)
+                        {
+                            product.ThumbNailPhoto = existingProduct.ThumbNailPhoto;
+                            product.ThumbnailPhotoFileName = existingProduct.ThumbnailPhotoFileName;
+                        }
+                    }
+                }
             }
             ViewData["ProductCategoryID"] = new SelectList(_context.ProductCategory, "ProductCategoryID", "Name", product.ProductCategoryID);
             ViewData["ProductModelID"] = new SelectList(_context.ProductModel, "ProductModelID", "Name", product.ProductModelID);
