@@ -8,6 +8,13 @@
 
 <h2>產品維護</h2>
 
+@if (ViewBag.AlertMessage != null)
+{
+    <script>
+        alert(@Html.Raw($"'{ViewBag.AlertMessage}'"));
+    </script>
+}
+
 <!-- search bar -->
 <form asp-action="Index" method="get" class="form-inline mb-3">
     <div style="display: flex;">
@@ -17,7 +24,6 @@
         <button type="submit" class="btn btn-primary" style="flex: 1; margin-left:5px">搜尋</button>
     </div>
 </form>
-
 
 <table class="table">
     <thead>

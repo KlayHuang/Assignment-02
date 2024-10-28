@@ -71,6 +71,9 @@ namespace Assignment_02.Controllers
                 ViewBag.CurrentPage = page;
                 ViewBag.TotalPages = totalPages;
 
+                if (totalProducts == 0)
+                    ViewBag.AlertMessage = "無符合搜尋條件的產品!!";
+
                 return View(products);
             }
             catch (Exception ex)
