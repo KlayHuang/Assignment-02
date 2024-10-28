@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Assignment_02.Models;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
 
 namespace Assignment_02.Controllers
 {
@@ -13,7 +14,7 @@ namespace Assignment_02.Controllers
     {
         private readonly AdventureWorksLT2022Context _context;
         private readonly ILogger<ProductsController> _logger;
-
+        
         public ProductsController(AdventureWorksLT2022Context context, ILogger<ProductsController> logger)
         {
             _context = context;
@@ -21,7 +22,7 @@ namespace Assignment_02.Controllers
         }
 
         // GET: Products
-        public async Task<IActionResult> Index(string searchTerm, int page)
+        public async Task<IActionResult> Index(string searchTermName, string searchTermProductNumber, string searchTermColor, int page)
         {
             try
             {
@@ -29,16 +30,30 @@ namespace Assignment_02.Controllers
                 {
                     page = 1;
                 }
-
                 int pageSize = 10;
-                // 產品搜尋
+
                 IQueryable<Product> productsQuery = _context.Product;
-                if (!string.IsNullOrEmpty(searchTerm))
+                if (!string.IsNullOrEmpty(searchTermName))
                 {
-                    productsQuery = productsQuery.Where(p => p.Name.Contains(searchTerm));
-                    ViewBag.SearchTerm = searchTerm;
+                    searchTermName = searchTermName.Trim();
+                    productsQuery = productsQuery.Where(p => p.Name.Contains(searchTermName));
+                    ViewBag.SearchTermName = searchTermName;
                 }
-                // -----
+
+                if (!string.IsNullOrEmpty(searchTermProductNumber))
+                {
+                    searchTermProductNumber = searchTermProductNumber.Trim();
+                    productsQuery = productsQuery.Where(p => p.ProductNumber.Contains(searchTermProductNumber));
+                    ViewBag.SearchTermProductNumber = searchTermProductNumber;
+                }
+
+                if (!string.IsNullOrEmpty(searchTermColor))
+                {
+                    searchTermColor = searchTermColor.Trim();
+                    productsQuery = productsQuery.Where(p => p.Color.Contains(searchTermColor));
+                    ViewBag.SearchTermColor = searchTermColor;
+                }
+
                 int totalProducts = await productsQuery.CountAsync();
                 int totalPages = (int)Math.Ceiling((double)totalProducts / pageSize);
 
@@ -259,4 +274,5 @@ namespace Assignment_02.Controllers
             return _context.Product.Any(e => e.ProductID == id);
         }
     }
+
 }
