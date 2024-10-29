@@ -22,7 +22,7 @@ namespace Assignment_02.Controllers
         }
 
         // GET: Products
-        public async Task<IActionResult> Index(string searchTermName, string searchTermProductNumber, string searchTermColor, int page)
+        public async Task<IActionResult> ListPage(string searchTermName, string searchTermProductNumber, string searchTermColor, int page)
         {
             try
             {
@@ -122,7 +122,7 @@ namespace Assignment_02.Controllers
             {
                 _context.Add(product);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(ListPage));
             }
             ViewData["ProductCategoryID"] = new SelectList(_context.ProductCategory, "ProductCategoryID", "Name", product.ProductCategoryID);
             ViewData["ProductModelID"] = new SelectList(_context.ProductModel, "ProductModelID", "Name", product.ProductModelID);
@@ -207,7 +207,7 @@ namespace Assignment_02.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(ListPage));
             }
             else
             {
@@ -269,7 +269,7 @@ namespace Assignment_02.Controllers
             }
 
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(ListPage));
         }
 
         private bool ProductExists(int id)

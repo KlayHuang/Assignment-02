@@ -16,7 +16,7 @@
 }
 
 <!-- search bar -->
-<form asp-action="Index" method="get" class="form-inline mb-3">
+<form asp-action="ListPage" method="get" class="form-inline mb-3">
     <div style="display: flex;">
         <input type="text" name="searchTermName" class="form-control mr-2" placeholder="搜尋產品名稱" value="@ViewBag.SearchTermName" style="flex: 0 0 30%;" />
         <input type="text" name="searchTermProductNumber" class="form-control mr-2" placeholder="搜尋產品編號" value="@ViewBag.SearchTermProductNumber" style="flex: 0 0 30%;" />
@@ -69,18 +69,18 @@
     <nav aria-label="Page navigation">
         <ul class="pagination">
             <li class="page-item @(currentPage == 1 ? "disabled" : "")">
-                <a class="page-link" asp-action="Index" asp-route-page="@(currentPage - 1)" asp-route-searchTermName="@ViewBag.SearchTermName" asp-route-searchTermProductNumber="@ViewBag.SearchTermProductNumber" asp-route-searchTermColor="@ViewBag.SearchTermColor">◀</a>
+                <a class="page-link" asp-action="ListPage" asp-route-page="@(currentPage - 1)" asp-route-searchTermName="@ViewBag.SearchTermName" asp-route-searchTermProductNumber="@ViewBag.SearchTermProductNumber" asp-route-searchTermColor="@ViewBag.SearchTermColor">◀</a>
             </li>
 
             @for (int i = 1; i <= totalPages; i++)
             {
                 <li class="page-item @(i == currentPage ? "active" : "")">
-                    <a class="page-link" asp-action="Index" asp-route-page="@i" asp-route-searchTermName="@ViewBag.SearchTermName" asp-route-searchTermProductNumber="@ViewBag.SearchTermProductNumber" asp-route-searchTermColor="@ViewBag.SearchTermColor">@i</a>
+                    <a class="page-link" asp-action="ListPage" asp-route-page="@i" asp-route-searchTermName="@ViewBag.SearchTermName" asp-route-searchTermProductNumber="@ViewBag.SearchTermProductNumber" asp-route-searchTermColor="@ViewBag.SearchTermColor">@i</a>
                 </li>
             }
 
             <li class="page-item @(currentPage == totalPages ? "disabled" : "")">
-                <a class="page-link" asp-action="Index" asp-route-page="@(currentPage + 1)" asp-route-searchTermName="@ViewBag.SearchTermName" asp-route-searchTermProductNumber="@ViewBag.SearchTermProductNumber" asp-route-searchTermColor="@ViewBag.SearchTermColor">▶</a>
+                <a class="page-link" asp-action="ListPage" asp-route-page="@(currentPage + 1)" asp-route-searchTermName="@ViewBag.SearchTermName" asp-route-searchTermProductNumber="@ViewBag.SearchTermProductNumber" asp-route-searchTermColor="@ViewBag.SearchTermColor">▶</a>
             </li>
         </ul>
     </nav>
